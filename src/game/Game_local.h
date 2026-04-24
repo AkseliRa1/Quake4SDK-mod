@@ -901,7 +901,7 @@ public:
 	// twhitaker: needed this for difficulty settings
 	float GetDifficultyModifier(void)
 	{
-		const static float difficulty[] = {-0.3f, 0.0f, 0.4f, 0.8f, 3.0f};
+		const static float difficulty[] = {-0.3f, 0.0f, 0.4f, 0.8f, 2.0f};
 		return difficulty[idMath::ClampInt(0, 4, g_skill.GetInteger())];
 	}
 
