@@ -3234,6 +3234,7 @@ gameStateType_t rvDMGameState::type = GS_DM;
 gameStateType_t rvTeamDMGameState::type = GS_TEAMDM;
 gameStateType_t rvCTFGameState::type = GS_CTF;
 gameStateType_t rvTourneyGameState::type = GS_TOURNEY;
+gameStateType_t rvCoopGameState::type = GS_COOP;
 
 bool rvGameState::IsType(gameStateType_t type) const
 {
@@ -3283,6 +3284,84 @@ gameStateType_t rvCTFGameState::GetClassType(void)
 gameStateType_t rvTourneyGameState::GetClassType(void)
 {
 	return rvTourneyGameState::type;
+}
+
+/*
+===============================================================================
+
+rvCoopGameState
+
+Game state info for Co-op
+
+===============================================================================
+*/
+
+/*
+================
+rvCoopGameState::rvCoopGameState
+================
+*/
+rvCoopGameState::rvCoopGameState(bool allocPrevious) : rvGameState(allocPrevious)
+{
+	trackPrevious = allocPrevious;
+}
+
+/*
+================
+rvCoopGameState::Run
+================
+*/
+void rvCoopGameState::Run(void)
+{
+	idPlayer *player = NULL;
+
+	rvGameState::Run();
+
+	switch (currentState)
+	{
+	case GAMEON:
+	{
+		// In co-op, check if all players are dead or mission objectives completed
+		// For now, use simple logic - if all players are dead, end game
+		bool allPlayersDead = true;
+		for (int i = 0; i < gameLocal.numClients; i++)
+		{
+			idPlayer *p = (idPlayer *)gameLocal.entities[i];
+			if (p && p->health > 0)
+			{
+				allPlayersDead = false;
+				break;
+			}
+		}
+
+		if (allPlayersDead)
+		{
+			NewState(GAMEREVIEW);
+			gameLocal.mpGame.PrintMessageEvent(-1, MSG_MISSIONFAILED, -1);
+		}
+		break;
+	}
+	}
+}
+
+/*
+================
+rvCoopGameState::IsType
+================
+*/
+bool rvCoopGameState::IsType(gameStateType_t type) const
+{
+	return (type == rvCoopGameState::type);
+}
+
+/*
+================
+rvCoopGameState::GetClassType
+================
+*/
+gameStateType_t rvCoopGameState::GetClassType(void)
+{
+	return rvCoopGameState::type;
 }
 
 /*

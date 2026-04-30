@@ -28,7 +28,8 @@ typedef enum
 	GS_TEAMDM,
 	GS_CTF,
 	GS_TOURNEY,
-	GS_DZ
+	GS_DZ,
+	GS_COOP
 } gameStateType_t;
 
 typedef enum
@@ -518,4 +519,29 @@ ID_INLINE bool operator!=(const dzStatus_t &lhs, const dzStatus_t rhs)
 {
 	return (lhs.state != rhs.state) || (lhs.clientNum != rhs.clientNum);
 }
+
+/*
+===============================================================================
+
+rvCoopGameState
+
+Game state info for Co-op
+
+===============================================================================
+*/
+
+class rvCoopGameState : public rvGameState
+{
+public:
+	rvCoopGameState(bool allocPrevious = true);
+
+	virtual void Run(void);
+
+	virtual bool IsType(gameStateType_t type) const;
+	static gameStateType_t GetClassType(void);
+
+private:
+	static gameStateType_t type;
+};
+
 #endif

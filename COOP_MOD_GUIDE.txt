@@ -1,0 +1,77 @@
+================================================================================
+QUAKE 4 CO-OP MOD IMPLEMENTATION GUIDE
+================================================================================
+
+✓ VAIHE 1: LISÄÄ GAME_COOP PELIMOODI
+================================================================================
+Tiedosto: src/game/MultiplayerGame.h
+Status: VALMIS - lisätty GAME_COOP enumeraattoriin
+
+Seuraavaksi tarvitaan:
+- Lisää pelimodin nimi ja kuvaus
+- Lisää spawn-pisteet co-opille
+
+================================================================================
+VAIHE 2: SPAWN-PISTEET
+================================================================================
+Tiedosto: src/game/Game_local.cpp
+
+Nämä funktiot muokattava:
+1. idGameLocal::GetPlayerSpawnSpot() - etsi sopiva spawn-piste
+2. idGameLocal::ClientSpawn() - spawna pelaaja
+
+Co-op vaatii:
+- Useita spawn-pisteitä (info_player_coop)
+- Ei pelaajien välistä konfliktia spawn-pisteistä
+
+================================================================================
+VAIHE 3: PELAAJIEN SYNKRONOINTI
+================================================================================
+Tiedosto: src/game/Game_network.cpp
+
+Varmista että:
+- Jokainen pelaaja näkee muut pelaajat
+- Pelaajien vammat/kuolemat synkronoidaan
+- Vihollisten tila synkronoidaan kaikille
+
+================================================================================
+VAIHE 4: VIHOLLISTEN VAIKEUS
+================================================================================
+Tiedosto: src/game/Actor.cpp
+
+Muutokset:
+- Skaala vihollisten health pelaajien määrän mukaan
+- Lisää vihollisten spawni-määrä
+- Muokkaa difficulty-skalaus
+
+================================================================================
+VAIHE 5: PELI-UI
+================================================================================
+Tiedosto: guis/ (GUI-tiedostot)
+
+- Näytä kaikkien pelaajien elämät HUD:ssä
+- Näytä co-op-tilaan sopivat viestit
+- Päivitä scoreboard co-opille
+
+================================================================================
+PERUSIDEA
+================================================================================
+
+Co-op modin peruslogiikka:
+1. Pelaajat spawnaa eri pisteistä
+2. Vihollisten terveyttä/määrää nostetaan
+3. Pelaajat voivat auttaa toisiaan taistelun jälkeen
+4. Missio päättyy kun kaikki pelaajat kuolevat TAI
+   kun missio saavutetaan
+
+================================================================================
+TESTAUS
+================================================================================
+
+1. Avaa map 2-3 pelaajalla
+2. Testaa spawn-logiikka
+3. Testaa vihollisten vaikeus
+4. Testaa pelaajien välinen kommunikaatio
+5. Testaa pelin loppu-ehdot
+
+================================================================================

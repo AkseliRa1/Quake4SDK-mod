@@ -6801,6 +6801,9 @@ void idMultiplayerGame::PrintMessageEvent(int to, msg_evt_t evt, int parm1, int 
 		case MSG_HOLYSHIT:
 			AddChatLine(common->GetLocalizedString("#str_106732"));
 			break;
+		case MSG_MISSIONFAILED:
+			AddChatLine("mission failed!");
+			break;
 		default:
 			gameLocal.DPrintf("PrintMessageEvent: unknown message type %d\n", evt);
 			return;
@@ -10236,6 +10239,11 @@ void idMultiplayerGame::SetGameType(void)
 	{
 		gameLocal.gameType = GAME_DEADZONE;
 		gameState = new riDZGameState;
+	}
+	else if ((idStr::Icmp(gameLocal.serverInfo.GetString("si_gameType"), "Co-op") == 0))
+	{
+		gameLocal.gameType = GAME_COOP;
+		gameState = new rvCoopGameState();
 	}
 	else
 	{

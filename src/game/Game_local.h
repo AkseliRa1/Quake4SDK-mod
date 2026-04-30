@@ -1032,6 +1032,7 @@ private:
 	idEventQueue eventQueue;
 
 	idList<idPlayerStart *> spawnSpots;
+	idList<idPlayerStart *> coopSpawnSpots; // Co-op spawn points
 	// RAVEN BEGIN
 	// ddynerman: two lists to hold team spawn points for team based games
 	idList<idPlayerStart *> teamSpawnSpots[TEAM_MAX];

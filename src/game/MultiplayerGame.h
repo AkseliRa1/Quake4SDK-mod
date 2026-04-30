@@ -34,6 +34,10 @@ typedef enum
 	// RITUAL BEGIN
 	// squirrel: added DeadZone multiplayer mode
 	GAME_DEADZONE,
+	
+	// Co-op mode added
+	GAME_COOP,
+	
 	NUM_GAME_TYPES,
 	// RITUAL END
 } gameType_t;
@@ -116,6 +120,7 @@ typedef enum
 	MSG_TELEFRAGGED,
 	MSG_JOINTEAM,
 	MSG_HOLYSHIT,
+	MSG_MISSIONFAILED,
 	MSG_COUNT
 } msg_evt_t;
 

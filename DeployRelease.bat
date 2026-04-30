@@ -1,6 +1,6 @@
 @echo off
 set Q4ModName=xanzcoop
-set Q4InstallPath=D:\Steam\steamapps\common\Quake 4
+set Q4InstallPath=D:\SteamLibrary\steamapps\common\Quake 4
 REM We have to delete these otherwise your game dll will be overwritten.
 del "%Q4InstallPath%\q4base\game000.pk4"
 del "%Q4InstallPath%\q4base\game100.pk4"
