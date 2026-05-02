@@ -19,7 +19,7 @@ All game cvars should be defined here.
 // ddynerman: our gameplay modes
 // RITUAL BEGIN
 // squirrel: added DeadZone multiplayer mode
-const char *si_gameTypeArgs[] = {"singleplayer", "DM", "Tourney", "Team DM", "CTF", "Arena CTF", "DeadZone", NULL};
+const char *si_gameTypeArgs[] = {"singleplayer", "DM", "Tourney", "Team DM", "CTF", "Arena CTF", "DeadZone", "Co-op", NULL};
 const int si_numGameTypeArgs = sizeof(si_gameTypeArgs) / sizeof(si_gameTypeArgs[0]);
 // RITUAL END
 // RAVEN END
@@ -56,7 +56,7 @@ idCVar si_dropWeaponsInBuyingModes("si_dropWeaponsInBuyingModes", "0", CVAR_GAME
 // RITUAL END
 // RAVEN BEGIN
 // ddynerman: new gametype strings
-idCVar si_gameType("si_gameType", si_gameTypeArgs[0], CVAR_GAME | CVAR_SERVERINFO | PC_CVAR_ARCHIVE, "game type - singleplayer, DM, Tourney, Team DM, CTF, Arena CTF, or DeadZone", si_gameTypeArgs, idCmdSystem::ArgCompletion_String<si_gameTypeArgs>);
+idCVar si_gameType("si_gameType", si_gameTypeArgs[0], CVAR_GAME | CVAR_SERVERINFO | PC_CVAR_ARCHIVE, "game type - singleplayer, DM, Tourney, Team DM, CTF, Arena CTF, DeadZone, or Co-op", si_gameTypeArgs, idCmdSystem::ArgCompletion_String<si_gameTypeArgs>);
 idCVar si_map("si_map", "mp/q4dm1", CVAR_GAME | CVAR_SERVERINFO | PC_CVAR_ARCHIVE, "map to be played next on server", idCmdSystem::ArgCompletion_MapName);
 idCVar si_mapCycle("si_mapCycle", "", CVAR_GAME | CVAR_SERVERINFO | PC_CVAR_ARCHIVE, "map cycle list semicolon delimited");
 // bdube: raise player limit

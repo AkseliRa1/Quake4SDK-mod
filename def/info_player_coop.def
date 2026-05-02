@@ -1,9 +1,0 @@
-entityDef info_player_coop
-{
-"inherit""info_player_start"
-"classname""info_player_coop"
-"editor_color""0.0 1.0 0.0"
-"editor_mins""-16 -16 -24"
-"editor_maxs""16 16 32"
-"editor_usage""Co-op player spawn point"
-}

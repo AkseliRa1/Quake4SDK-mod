@@ -2051,6 +2051,7 @@ void idGameLocal::MapPopulate(int instance)
 	// RAVEN BEGIN
 	// ddynerman: prepare the list of spawn spots
 	InitializeSpawns();
+	common->Printf("gameType=%d, si_gameType='%s'\n", gameType, serverInfo.GetString("si_gameType"));
 	// RAVEN END
 
 	// execute pending events before the very first game frame
@@ -7951,6 +7952,8 @@ void idGameLocal::InitializeSpawns(void)
 		teamSpawnSpots[i].Clear();
 	}
 
+	coopSpawnSpots.Clear();
+
 	spot = FindEntityUsingDef(NULL, "info_player_team");
 	while (spot)
 	{
@@ -7988,6 +7991,7 @@ void idGameLocal::InitializeSpawns(void)
 		spot = FindEntityUsingDef(spot, "info_player_deathmatch");
 	}
 
+	spot = FindEntityUsingDef(NULL, "info_player_coop");
 	while (spot)
 	{
 		// RAVEN BEGIN
@@ -7995,20 +7999,9 @@ void idGameLocal::InitializeSpawns(void)
 		if (spot->IsType(idPlayerStart::GetClassType()))
 		{
 			// RAVEN END
-			if (!idStr::Icmp(spot->spawnArgs.GetString("team"), "strogg"))
-			{
-				teamSpawnSpots[TEAM_STROGG].Append(static_cast<idPlayerStart *>(spot));
-			}
-			else if (!idStr::Icmp(spot->spawnArgs.GetString("team"), "marine"))
-			{
-				teamSpawnSpots[TEAM_MARINE].Append(static_cast<idPlayerStart *>(spot));
-			}
-
-			// spawnSpots contains info_player_team as well as info_player_deathmatch
-			spawnSpots.Append(static_cast<idPlayerStart *>(spot));
+			coopSpawnSpots.Append(static_cast<idPlayerStart *>(spot));
 		}
-
-		spot = FindEntityUsingDef(spot, "info_player_team");
+		spot = FindEntityUsingDef(spot, "info_player_coop");
 	}
 
 	if (IsFlagGameType() && (teamSpawnSpots[TEAM_STROGG].Num() == 0 || teamSpawnSpots[TEAM_MARINE].Num() == 0))
@@ -8016,14 +8009,28 @@ void idGameLocal::InitializeSpawns(void)
 		Error("InitializeSpawns() - Map must have at least one Marine and one Strogg spawn for CTF gametype.");
 	}
 
+	if (gameType == GAME_COOP && coopSpawnSpots.Num() == 0)
+	{
+		Error("InitializeSpawns() - Map must have at least one co-op spawn for co-op gametype.");
+	}
+
 	if (spawnSpots.Num() == 0)
 	{
-		Error("InitializeSpawns() - Map must have a spawn spot.");
+		if (coopSpawnSpots.Num() > 0)
+		{
+			common->Printf("No regular spawns found, using %d co-op spawns as a fallback.\n", coopSpawnSpots.Num());
+			spawnSpots = coopSpawnSpots;
+		}
+		else
+		{
+			Error("InitializeSpawns() - Map must have a spawn spot.");
+		}
 	}
 
 	common->Printf("%d general spawns\n", spawnSpots.Num());
 	common->Printf("%d team spawns (%d strogg/%d marine)\n", teamSpawnSpots[TEAM_STROGG].Num() + teamSpawnSpots[TEAM_MARINE].Num(),
 				   teamSpawnSpots[TEAM_STROGG].Num(), teamSpawnSpots[TEAM_MARINE].Num());
+	common->Printf("%d co-op spawns\n", coopSpawnSpots.Num());
 }
 
 /*
@@ -8095,6 +8102,16 @@ idEntity *idGameLocal::SelectSpawnPoint(idPlayer *player)
 	if (player->team < 0 || player->team >= TEAM_MAX || player->spectating)
 	{
 		common->DPrintf("Returning a random spot\n");
+		if (spawnSpots.Num() == 0 && coopSpawnSpots.Num() > 0)
+		{
+			common->DPrintf("RandomSpawn: no regular spawns, falling back to %d co-op spawns\n", coopSpawnSpots.Num());
+			return coopSpawnSpots[random.RandomInt(coopSpawnSpots.Num())];
+		}
+		if (spawnSpots.Num() == 0)
+		{
+			Error("SelectSpawnPoint() - no spawn spots available for spectator/random selection.");
+			return NULL;
+		}
 		return spawnSpots[random.RandomInt(spawnSpots.Num())];
 	}
 
@@ -8107,6 +8124,10 @@ idEntity *idGameLocal::SelectSpawnPoint(idPlayer *player)
 	if (gameLocal.gameType == GAME_DM || gameLocal.gameType == GAME_TDM || gameLocal.gameType == GAME_TOURNEY)
 	{
 		spawnArray = &spawnSpots;
+	}
+	else if (gameLocal.gameType == GAME_COOP)
+	{
+		spawnArray = &coopSpawnSpots;
 	}
 	else if (IsFlagGameType() || gameLocal.gameType == GAME_DEADZONE)
 	{
@@ -8122,6 +8143,18 @@ idEntity *idGameLocal::SelectSpawnPoint(idPlayer *player)
 	// RITUAL END
 
 	if (spawnArray == NULL)
+	{
+		Error("SelectSpawnPoint() - invalid spawn list.");
+		return NULL;
+	}
+
+	if (spawnArray->Num() == 0 && coopSpawnSpots.Num() > 0)
+	{
+		common->DPrintf("SelectSpawnPoint(): selected spawn list empty, falling back to co-op spawns\n");
+		spawnArray = &coopSpawnSpots;
+	}
+
+	if (spawnArray->Num() == 0)
 	{
 		Error("SelectSpawnPoint() - invalid spawn list.");
 		return NULL;

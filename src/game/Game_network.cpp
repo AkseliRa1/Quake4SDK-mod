@@ -4055,5 +4055,16 @@ idGameLocal::RandomSpawn
 */
 idPlayerStart *idGameLocal::RandomSpawn(void)
 {
+	if (spawnSpots.Num() == 0 && coopSpawnSpots.Num() > 0)
+	{
+		return coopSpawnSpots[random.RandomInt(coopSpawnSpots.Num())];
+	}
+
+	if (spawnSpots.Num() == 0)
+	{
+		Error("RandomSpawn() - no spawn spots available.");
+		return NULL;
+	}
+
 	return spawnSpots[random.RandomInt(spawnSpots.Num())];
 }
