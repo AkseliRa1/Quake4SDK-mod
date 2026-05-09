@@ -3732,7 +3732,7 @@ void idPlayer::UpdateHudAmmo(idUserInterface *_hud)
 		_hud->SetStateString("player_totalammo", "-1");
 		_hud->SetStateFloat("player_ammopct", 1.0f);
 	}
-	else if (weapon->ClipSize() && !gameLocal.isMultiplayer)
+	else if (weapon->ClipSize() && (!gameLocal.isMultiplayer || gameLocal.gameType == GAME_COOP))
 	{
 		_hud->SetStateInt("player_clip_size", weapon->ClipSize());
 		_hud->SetStateFloat("player_ammopct", (float)inclip / (float)weapon->ClipSize());
@@ -14482,6 +14482,13 @@ bool idPlayer::GetPhysicsToSoundTransform(idVec3 &origin, idMat3 &axis)
 /*
 ================
 idPlayer::WriteToSnapshot
+Tämä funktio hoitaa pelaajan tiedon siirtämisen serveriltä clientille.
+This function handles the transfer of player data from the server to the client.
+
+server - lähettää pelaajan tiedot clientille
+client - vastaanottaa pelaajan tiedot serveriltä
+
+
 ================
 */
 void idPlayer::WriteToSnapshot(idBitMsgDelta &msg) const
@@ -14525,6 +14532,8 @@ void idPlayer::WriteToSnapshot(idBitMsgDelta &msg) const
 	msg.WriteBits(inBuyZone, 1);
 	msg.WriteLong((int)buyMenuCash);
 	// RITUAL END
+
+	msg.WriteBits(flashlightOn, 1);
 }
 
 /*
@@ -14679,6 +14688,7 @@ void idPlayer::ReadFromSnapshot(const idBitMsgDelta &msg)
 			gameLocal.mpGame.RedrawLocalBuyMenu();
 		}
 		// RITUAL END
+		flashlightOn = msg.ReadBits(1) != 0;
 	}
 	// no msg reading below this
 
@@ -15195,6 +15205,11 @@ void idPlayer::ToggleFlashlight(void)
 		// Couldnt find flashlight
 		if (flashlightWeapon < 0)
 		{
+			flashlightOn = !flashlightOn;
+			if (weapon)
+			{
+				weapon->Flashlight();
+			}
 			return;
 		}
 	}
@@ -15209,6 +15224,7 @@ void idPlayer::ToggleFlashlight(void)
 	}
 	else if (weapon)
 	{
+		flashlightOn = !flashlightOn;
 		weapon->Flashlight();
 	}
 }

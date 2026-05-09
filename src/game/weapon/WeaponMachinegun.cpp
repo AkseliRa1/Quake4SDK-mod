@@ -360,14 +360,7 @@ stateResult_t rvWeaponMachinegun::State_Flashlight(const stateParms_t &parms)
 			return SRESULT_WAIT;
 		}
 
-		if (owner->IsFlashlightOn())
-		{
-			Flashlight(false);
-		}
-		else
-		{
-			Flashlight(true);
-		}
+		Flashlight(owner->IsFlashlightOn());
 
 		SetState("Idle", 4);
 		return SRESULT_DONE;

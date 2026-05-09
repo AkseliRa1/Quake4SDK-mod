@@ -1938,9 +1938,9 @@ idPlayer *idMultiplayerGame::FragLimitHit()
 	int fragLimit = gameLocal.serverInfo.GetInt("si_fragLimit");
 	idPlayer *leader = NULL;
 
-	if (fragLimit <= 0)
+	if (fragLimit <= 0 || gameLocal.gameType == GAME_COOP)
 	{
-		return NULL; // fraglimit disabled
+		return NULL; // fraglimit disabled or co-op mode
 	}
 
 	leader = FragLeader();
@@ -1965,7 +1965,7 @@ idMultiplayerGame::TimeLimitHit
 bool idMultiplayerGame::TimeLimitHit(void)
 {
 	int timeLimit = gameLocal.serverInfo.GetInt("si_timeLimit");
-	if (timeLimit)
+	if (timeLimit && gameLocal.gameType != GAME_COOP)
 	{
 		if (gameLocal.time >= matchStartedTime + timeLimit * 60000)
 		{

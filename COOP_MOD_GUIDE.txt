@@ -12,20 +12,32 @@ Seuraavaksi tarvitaan:
 - Lisää spawn-pisteet co-opille
 
 ================================================================================
-VAIHE 2: SPAWN-PISTEET
+✓ VAIHE 2: SPAWN-PISTEET
 ================================================================================
 Tiedosto: src/game/Game_local.cpp
+Status: VALMIS - lisätty info_player_coop spawn-pisteet
 
-Nämä funktiot muokattava:
-1. idGameLocal::GetPlayerSpawnSpot() - etsi sopiva spawn-piste
-2. idGameLocal::ClientSpawn() - spawna pelaaja
+Muokatut funktiot:
+- InitializeSpawns() - kerää coop spawn-pisteet
+- SelectSpawnPoint() - käyttää coop spawn-pisteitä
 
 Co-op vaatii:
 - Useita spawn-pisteitä (info_player_coop)
 - Ei pelaajien välistä konfliktia spawn-pisteistä
 
 ================================================================================
-VAIHE 3: PELAAJIEN SYNKRONOINTI
+✓ VAIHE 3: MUUTA CO-OP MUISTUTTAMAAN SINGLE PLAYERIÄ
+================================================================================
+Tiedosto: src/game/MultiplayerGame.cpp
+Status: VALMIS - poistettu frag ja time limit co-opille
+
+Muutokset:
+- FragLimitHit() - ei lopeta peliä co-opissa
+- TimeLimitHit() - ei lopeta peliä co-opissa
+- Peli jatkuu kunnes missio saavutetaan tai kaikki pelaajat kuolevat
+
+================================================================================
+VAIHE 4: PELAAJIEN SYNKRONOINTI
 ================================================================================
 Tiedosto: src/game/Game_network.cpp
 
@@ -35,7 +47,7 @@ Varmista että:
 - Vihollisten tila synkronoidaan kaikille
 
 ================================================================================
-VAIHE 4: VIHOLLISTEN VAIKEUS
+VAIHE 5: VIHOLLISTEN VAIKEUS
 ================================================================================
 Tiedosto: src/game/Actor.cpp
 
@@ -45,13 +57,73 @@ Muutokset:
 - Muokkaa difficulty-skalaus
 
 ================================================================================
-VAIHE 5: PELI-UI
+VAIHE 6: PELI-UI
 ================================================================================
 Tiedosto: guis/ (GUI-tiedostot)
 
 - Näytä kaikkien pelaajien elämät HUD:ssä
 - Näytä co-op-tilaan sopivat viestit
 - Päivitä scoreboard co-opille
+
+================================================================================
+VAIHE 7: ASEIDEN LATAAMINEN MONINPELISSÄ
+================================================================================
+Tiedosto: src/game/Weapon.cpp
+
+Muutokset:
+- osuma effekti samaksi kun sigleplayerissa
+- Muokkaa rvWeapon::Reload() funktiota sallimaan lataaminen moninpelissä
+- Varmista että aseilla on clipSize > 0 co-opissa
+- Testaa että lataus toimii kuten yksinpelissä
+
+================================================================================
+VAIHE 8: PELAAJIEN LIIKKUMINEN JA ANIMAATIOT
+================================================================================
+Tiedosto: src/game/gamesys/SysCvar.cpp, src/game/Player_States.cpp
+
+Muutokset:
+- Tarkista pm_speed ja animaatiot ovat samat SP ja MP välillä
+- Jos eroja, yhdistä ne co-opille
+
+================================================================================
+VAIHE 9: AMMUKSET JA TERVEYS
+================================================================================
+Tiedosto: src/game/Player.cpp, src/game/Weapon.cpp
+
+Muutokset:
+- Hallitse ammukset pelaajien välillä (jaettu tai erillinen?)
+- Terveys jakaminen tai synkronointi
+- Kuolema vaikuttaa muihin pelaajiin
+
+================================================================================
+VAIHE 10: RESPAWNING JA CHECKPOINTIT
+================================================================================
+Tiedosto: src/game/Player.cpp, src/game/Game_local.cpp
+
+Muutokset:
+- Pelaajat respawnaavat kuoleman jälkeen
+- Checkpoint-logiikka missioiden tallentamiseen
+- Respawn-pisteet co-opille
+
+================================================================================
+VAIHE 11: OBJEKTIIVIEN SYNKRONOINTI
+================================================================================
+Tiedosto: src/game/MultiplayerGame.cpp, guis/
+
+Muutokset:
+- Objektiivit päivittyvät kaikille pelaajille
+- Missio päättyy kun kaikki objektiivit saavutetaan
+- Näytä objektiivit HUD:ssä
+
+================================================================================
+VAIHE 12: VIHOLLISTEN AI MUUTOKSET
+================================================================================
+Tiedosto: src/game/Actor.cpp, ai/
+
+Muutokset:
+- Viholliset hyökkäävät kaikkia pelaajia vastaan
+- Skaalaa vahinko ja health pelaajien määrän mukaan
+- Lisää co-op spesifejä AI käyttäytymisiä
 
 ================================================================================
 PERUSIDEA
@@ -73,5 +145,6 @@ TESTAUS
 3. Testaa vihollisten vaikeus
 4. Testaa pelaajien välinen kommunikaatio
 5. Testaa pelin loppu-ehdot
-
-================================================================================
+6. Testaa lataaminen ja ammukset
+7. Testaa respawning ja checkpointit
+8. Testaa objektiivit ja synkronointi
