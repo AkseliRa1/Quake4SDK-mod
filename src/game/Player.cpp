@@ -14532,7 +14532,8 @@ void idPlayer::WriteToSnapshot(idBitMsgDelta &msg) const
 	msg.WriteBits(inBuyZone, 1);
 	msg.WriteLong((int)buyMenuCash);
 	// RITUAL END
-
+	// client needs to know if flashlight is on or off so it can update the flashlight state on the view model.
+	// added by akr for coop mod.
 	msg.WriteBits(flashlightOn, 1);
 }
 
@@ -14688,6 +14689,8 @@ void idPlayer::ReadFromSnapshot(const idBitMsgDelta &msg)
 			gameLocal.mpGame.RedrawLocalBuyMenu();
 		}
 		// RITUAL END
+		//updates flashlight state server state.
+		//added by akr for coop mod
 		flashlightOn = msg.ReadBits(1) != 0;
 	}
 	// no msg reading below this
@@ -15179,7 +15182,16 @@ void idPlayer::ToggleFlashlight(void)
 	}
 	// RAVEN END
 
+	
 	int flashlightWeapon = currentWeapon;
+	
+	if (flashlightWeapon == 2 || flashlightWeapon == 3)
+	{
+		flashlightOn = !flashlightOn;
+		weapon->Flashlight();
+		return;
+	}
+
 	if (!spawnArgs.GetBool(va("weapon%d_flashlight", flashlightWeapon)))
 	{
 		// TODO: find the first flashlight weapon that has ammo starting at the bottom
