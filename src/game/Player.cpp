@@ -3291,11 +3291,30 @@ void idPlayer::RestorePersistantInfo(void)
 
 	spawnArgs.Copy(gameLocal.persistentPlayerInfo[entityNumber]);
 
+	// CO-OP: patch the player def BEFORE RestoreInventory so that:
+	//   - def_weapon0 = weapon_blaster  → SlotForWeapon/NextBestWeapon/key-1 all work
+	//   - "weapon"    = weapon_blaster  → RestoreInventory's Give() gives blaster, not gauntlet
+	if (gameLocal.isMultiplayer && gameLocal.gameType == GAME_COOP)
+	{
+		spawnArgs.Set("def_weapon0", "weapon_blaster");
+		spawnArgs.Set("weapon", "weapon_blaster");
+	}
+
 	inventory.RestoreInventory(this, spawnArgs);
 	health = spawnArgs.GetInt("health", "100");
 	if (!gameLocal.isClient)
 	{
 		idealWeapon = spawnArgs.GetInt("current_weapon", "0");
+	}
+
+	// CO-OP: force inventory to blaster-only and select it unconditionally
+	if (gameLocal.isMultiplayer && gameLocal.gameType == GAME_COOP)
+	{
+		inventory.weapons = (1 << 0);   // slot 0 = weapon_blaster (patched above)
+		if (!gameLocal.isClient)
+		{
+			idealWeapon = 0;
+		}
 	}
 }
 

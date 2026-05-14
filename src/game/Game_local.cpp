@@ -3210,6 +3210,8 @@ void idGameLocal::SpawnPlayer(int clientNum)
 	args.Set("classname", idPlayer::GetSpawnClassname());
 	// RAVEN END
 
+	// CO-OP starting weapon (Blaster instead of Gauntlet) is handled in idPlayer::RestorePersistantInfo.
+
 	// This takes a really long time.
 	PACIFIER_UPDATE;
 	if (!SpawnEntityDef(args, &ent) || !entities[clientNum])
