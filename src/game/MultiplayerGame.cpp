@@ -10340,7 +10340,8 @@ bool idMultiplayerGame::PickMap(idStr gameType, bool checkOnly)
 	if (checkOnly)
 	{
 		// always allow switching to DM mode, whatever the settings on the map ( DM should always be possible )
-		if (!idStr::Icmp(si_gameType.GetString(), "DM"))
+		// also always allow Co-op, since it runs on SP campaign maps which have no Co-op key in their mapdef
+		if (!idStr::Icmp(si_gameType.GetString(), "DM") || !idStr::Icmp(si_gameType.GetString(), "Co-op"))
 		{
 			return false;
 		}

@@ -2092,7 +2092,8 @@ void idPlayer::Spawn(void)
 			cinematicHud = uiManager->FindGui(temp, true, false, true);
 		}
 
-		if (!gameLocal.isMultiplayer)
+		// COOP mode - load the wristcomm
+		if (!gameLocal.isMultiplayer || gameLocal.gameType == GAME_COOP)
 		{
 			objectiveSystem = uiManager->FindGui(spawnArgs.GetString("wristcomm", "guis/wristcomm.gui"), true, false, true);
 			objectiveSystemOpen = false;
@@ -2250,7 +2251,7 @@ void idPlayer::Spawn(void)
 
 	// Skil levels
 	dynamicProtectionScale = 1.0f;
-	if (!gameLocal.isMultiplayer)
+	if (!gameLocal.isMultiplayer || gameLocal.gameType != GAME_COOP)
 	{
 		if (g_skill.GetInteger() < 2)
 		{
@@ -3284,7 +3285,7 @@ Restores any inventory and player stats when changing levels.
 */
 void idPlayer::RestorePersistantInfo(void)
 {
-	if (gameLocal.isMultiplayer)
+	if (gameLocal.isMultiplayer && gameLocal.gameType != GAME_COOP)
 	{
 		gameLocal.persistentPlayerInfo[entityNumber].Clear();
 	}
@@ -3298,6 +3299,7 @@ void idPlayer::RestorePersistantInfo(void)
 	{
 		spawnArgs.Set("def_weapon0", "weapon_blaster");
 		spawnArgs.Set("weapon", "weapon_blaster");
+		
 	}
 
 	inventory.RestoreInventory(this, spawnArgs);
@@ -3575,6 +3577,11 @@ bool idPlayer::UserInfoChanged(void)
 	showWeaponViewModel = userInfo->GetBool("ui_showGun");
 
 	if (!gameLocal.isMultiplayer)
+	{
+		return false;
+	}
+
+	if(gameLocal.gameType == GAME_COOP)
 	{
 		return false;
 	}
@@ -6220,9 +6227,11 @@ int idPlayer::SlotForWeapon(const char *weaponName)
 idPlayer::Reload
 ===============
 */
+// is is called for weapons that have a reload animation.  like the shotgun and the nailgun but not active reload if gametype is multiplayer
+// need to change this logic later
 void idPlayer::Reload(void)
 {
-	if (gameLocal.isClient || spectating || gameLocal.inCinematic || influenceActive || !weapon)
+	if (gameLocal.isClient || spectating || gameLocal.inCinematic || influenceActive || !weapon || gameLocal.gameType != GAME_COOP)
 	{
 		return;
 	}
@@ -10133,7 +10142,7 @@ bool idPlayer::HandleESC(void)
 
 // jdischler: Straight from the top, cinematic skipping on xenon is OFFICIALLY OUT.  Too many problems with it and not enough time to properly address them.
 #ifndef _XENON
-	if (gameLocal.inCinematic)
+	if (gameLocal.inCinematic )
 	{
 		return SkipCinematic();
 	}

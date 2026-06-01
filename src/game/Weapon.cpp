@@ -2025,8 +2025,9 @@ bool rvWeapon::AutoReload(void)
 {
 	assert(owner);
 
-	// on a network client, never predict reloads of other clients. wait for the server
-	if (gameLocal.isClient)
+	// on a network client in regular MP, never predict reloads of other clients. wait for the server.
+	// in co-op we allow it, since weapons have clips like SP.
+	if (gameLocal.isClient && gameLocal.gameType != GAME_COOP)
 	{
 		return false;
 	}

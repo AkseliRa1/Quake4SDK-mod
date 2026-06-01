@@ -4360,8 +4360,8 @@ escReply_t idGameLocal::HandleESC(idUserInterface **gui)
 	}
 #endif
 	// RAVEN END
-
-	if (isMultiplayer)
+	// in multiplayer, bring up the menu, but not in coop since that is really just single player with a few extra features.
+	if (isMultiplayer &&  gameType != GAME_COOP)
 	{
 		*gui = StartMenu();
 		// we may set the gui back to NULL to hide it
@@ -5588,7 +5588,7 @@ const idDeclEntityDef *idGameLocal::FindEntityDef(const char *name, bool makeDef
 {
 	TIME_THIS_SCOPE(__FUNCLINE__);
 	const idDecl *decl = NULL;
-	if (isMultiplayer)
+	if (isMultiplayer && gameType != GAME_COOP)
 	{
 		decl = declManager->FindType(DECL_ENTITYDEF, va("%s_mp", name), false);
 	}
